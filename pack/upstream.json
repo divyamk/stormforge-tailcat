@@ -1,0 +1,18 @@
+{
+  "project": "https://modrinth.com/modpack/stormforge",
+  "version": "https://modrinth.com/modpack/stormforge/version/k5ownM36",
+  "version_number": "2.3.0",
+  "license": "MIT",
+  "download": {
+    "id": "VogiGvBq",
+    "hashes": {
+      "sha512": "dff5d0a702d5a829fcb7ad79a6f3104f70a7d4673cc599d4bf6a521a83cca6ae9ed705f729c74df65a840d4864c42f2b64d0bb22e6472468245b0c288f3bcee7",
+      "sha1": "2128eb698b9389545ec5ac2cf5039fab1ec61085"
+    },
+    "url": "https://cdn.modrinth.com/data/Mclf6Juw/versions/k5ownM36/Stormforge%202.3.0.mrpack",
+    "filename": "Stormforge 2.3.0.mrpack",
+    "primary": true,
+    "size": 19971530,
+    "file_type": null
+  }
+}

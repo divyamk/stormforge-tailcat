@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="BSD-3-Clause"
+[[mods]]
+modId="tailcat_for_minecraft"
+version="0.1.1-forge-1.20.1"
+displayName="Tailcat for Minecraft (Forge port)"
+description="Local Forge 1.20.1 port of Tailcat world sharing."
+displayTest="IGNORE_ALL_VERSION"
+[[dependencies.tailcat_for_minecraft]]
+modId="forge"
+mandatory=true
+versionRange="[47.4,)"
+ordering="NONE"
+side="CLIENT"
+[[dependencies.tailcat_for_minecraft]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.20.2)"
+ordering="NONE"
+side="CLIENT"
