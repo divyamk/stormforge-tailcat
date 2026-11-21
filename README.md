@@ -28,6 +28,12 @@ Download [only the Forge Tailcat JAR](https://github.com/divyamk/stormforge-tail
 
 If the first connection times out, retry once after a few seconds; the relay needed a retry in the local transport test. If sharing was stopped or Minecraft restarted, request a fresh invitation. Treat the invitation as access to the live world, and do not post it in GitHub issues or logs.
 
+## Crafting-table “Error Rendering” fix
+
+Stormforge 2.3.0 bundles EMI 1.1.24 with TMRV 0.9.2, whose newer JEI API can cause `AbstractMethodError` in the crafting-table recipe view. The original full-pack release does not include the separate compatibility add-on.
+
+[Download the recipe compatibility add-on](https://github.com/divyamk/stormforge-tailcat/releases/tag/recipe-compat-0.1.0) and install it into your existing instance, then restart. [Give these instructions to your bot](FIX_JEI_WITH_GPT.md). Recipe interaction still needs to be checked in-game after installation; see the release notes for validation limits.
+
 ## Let GPT set it up
 
 Copy the prompt in [SETUP_WITH_GPT.md](SETUP_WITH_GPT.md) into your friend's GPT/Codex. A chat with no computer access can guide them, but cannot operate Modrinth for them.

@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="BSD-3-Clause"
+[[mods]]
+modId="stormforge_emi_compat"
+version="0.1.0"
+displayName="Stormforge EMI Compatibility"
+description="Restores recipe rendering and filling for EMI 1.1.24 with TMRV 0.9.2's newer JEI interface."
+displayTest="IGNORE_ALL_VERSION"
+[[dependencies.stormforge_emi_compat]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.20.2)"
+ordering="NONE"
+side="CLIENT"
+[[dependencies.stormforge_emi_compat]]
+modId="emi"
+mandatory=true
+versionRange="[1.1.24,1.1.25)"
+ordering="AFTER"
+side="CLIENT"
+[[dependencies.stormforge_emi_compat]]
+modId="toomanyrecipeviewers"
+mandatory=true
+versionRange="[0.9.2,0.9.3)"
+ordering="AFTER"
+side="CLIENT"

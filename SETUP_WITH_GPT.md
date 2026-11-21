@@ -20,3 +20,5 @@ Required versions: Stormforge: Never Ending Rain 2.3.0, Minecraft 1.20.1, Forge 
 7. If the first connection times out, retry after a few seconds. If it still fails, inspect the current logs and check matching versions and whether the host is still sharing. Do not disable authentication, firewalls, or other security settings to troubleshoot.
 
 No Tailscale app or port forwarding should be needed. This is an unofficial prototype port: build/startup and a local transport test passed, but two-computer gameplay has not yet been verified. Tell me exactly what you verified and any remaining blocker.
+
+If the crafting-table recipe view shows “Error Rendering,” follow https://github.com/divyamk/stormforge-tailcat/blob/main/FIX_JEI_WITH_GPT.md to install the separate EMI/TMRV compatibility add-on. The original .mrpack does not contain that add-on.

@@ -1,0 +1,14 @@
+plugins { id 'net.minecraftforge.gradle' version '[6.0,6.2)' }
+version = '0.1.0'
+group = 'com.divyamk.stormforge'
+base { archivesName = 'stormforge-emi-compat-1.20.1' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+minecraft { mappings channel: 'official', version: '1.20.1' }
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.10'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+}
+tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-proc:none'] }
+test { useJUnitPlatform() }
+jar { manifest { attributes 'MixinConfigs': 'stormforge-emi-compat.mixins.json' } }
+jar.finalizedBy('reobfJar')
