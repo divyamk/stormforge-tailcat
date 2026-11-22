@@ -1,72 +1,77 @@
 # Stormforge: Never Ending Rain + Tailcat
 
-An unofficial, ready-to-import **Stormforge 2.3.0** modpack with a local Forge port of **Tailcat 0.1.1** for sharing single-player worlds with friends.
+Unofficial Tailcat Forge client for **Stormforge 2.3.0** ([pack version k5ownM36](https://modrinth.com/modpack/stormforge/version/k5ownM36)), Minecraft **1.20.1**, Forge **47.4.10**, and **arm64 Java 17**.
 
-- Minecraft **1.20.1**, Forge **47.4.10**, Java **17**.
-- All 173 original Stormforge download entries and original overrides are preserved. The only added mod is Tailcat.
-- This repository is a fork of [Tailcat for Minecraft](https://github.com/tailscale/tailcat-for-minecraft), not an official Stormforge source repository. Stormforge does not list a source repository on Modrinth.
-- Tailcat is a prototype, not an officially supported Tailscale product. This Forge port is unofficial.
+## Current update: Tailcat 0.1.3
 
-## Install in Modrinth App
+**Modern Tailcat v0.7.0 invitations: Apple silicon Macs, macOS 13 or newer only.** Use an arm64 Java 17 runtime. This is the exact client JAR verified to authenticate and enter a live server through **Multiplayer → Connect with Tailcat**.
 
-1. [Download the ready-to-import pack](https://github.com/divyamk/stormforge-tailcat/releases/download/stormforge-2.3.0-tailcat-0.1.1/Stormforge-Tailcat-2.3.0-0.1.1.mrpack).
-2. Open Modrinth App → **Create new instance / New instance** → **Import from file**, then select the downloaded `.mrpack`. Labels may vary by app version; opening the file with Modrinth also works when file associations are configured.
-3. Name the new instance **Stormforge + Tailcat**. Let Modrinth finish downloading the pack and its managed Java runtime.
-4. Sign into your own Minecraft account if necessary, then launch the new instance.
+[Download release 0.1.3](https://github.com/divyamk/stormforge-tailcat/releases/tag/tailcat-forge-0.1.3) · [Give the update instructions to your bot](UPDATE_WITH_GPT.md)
 
-The pack already contains Tailcat. Do not install the original Fabric Tailcat JAR into this Forge pack.
+File: `tailcat-for-minecraft-0.1.3-forge-1.20.1.jar`
 
-### If Stormforge 2.3.0 is already installed
+SHA-256:
 
-Download [only the Forge Tailcat JAR](https://github.com/divyamk/stormforge-tailcat/releases/download/stormforge-2.3.0-tailcat-0.1.1/tailcat-for-minecraft-0.1.1-forge-1.20.1.jar). Open that instance in Modrinth → **Content → Upload files**, select the JAR, and restart Minecraft. If another Tailcat JAR is already installed, replace it so only v0.1.1 is enabled. Do not change existing worlds or unrelated mods.
+```text
+3e037a498b8966b9c7e29978fa251784c0a8069d1ba66518f2f62b61cde16efd
+```
 
-## Join your friend's world
+1. Confirm the existing profile is Stormforge 2.3.0, Minecraft 1.20.1, Forge 47.4.10, running arm64 Java 17 on macOS 13+.
+2. Quit Minecraft yourself and wait for its process to exit. Back up the existing Tailcat JAR outside the profile's `mods` folder.
+3. Download the JAR from the release, verify its SHA-256, and replace only the existing Tailcat JAR. Keep exactly one enabled Tailcat JAR. Preserve all other mods, settings, and worlds.
+4. Launch that same profile, sign in with your own Minecraft account, and use **Multiplayer → Connect with Tailcat**. Paste the server invitation privately into the game. Never put it in chat, source control, shell arguments, screenshots, or logs.
+5. Success means reaching the authenticated server world. If Forge reports incompatible or missing channels, report the exact mod/channel names to the server owner; do not remove mods or disable authentication to work around it.
 
-**Host:** launch Stormforge 2.3.0 with this Tailcat port, open the world, press Escape, then click **Share with Tailcat** at the upper right. Copy the `mcl1_...` invitation and send it privately to your friend. Keep the world and game open.
+Rollback: quit Minecraft, remove this JAR, and restore the verified previous Tailcat JAR from the backup.
 
-**Friend:** launch the new instance → **Multiplayer → Connect with Tailcat** at the upper right → paste the invitation → connect. Both players must use the same Stormforge version. No separate Tailscale installation or router port forwarding is required.
+## What changed
 
-If the first connection times out, retry once after a few seconds; the relay needed a retry in the local transport test. If sharing was stopped or Minecraft restarted, request a fresh invitation. Treat the invitation as access to the live world, and do not post it in GitHub issues or logs.
+Modern raw `tc…` invitations use a separate helper built from the official Tailcat v0.7.0 Go SDK. The invitation reaches the helper over stdin. SDK logging is suppressed to keep credentials private. The helper binds only loopback and connects to virtual Minecraft port 25565.
 
-## Crafting-table “Error Rendering” fix
+Only the modern helper subprocess sets `TS_DEBUG_ALWAYS_USE_DERP=true`. This keeps it on the invitation's existing encrypted DERP relay and avoids the burst-delivery stall reproduced with automatic path selection. No system networking, server setting, account authentication, or security control is changed. Relay use can have higher latency than a working direct path.
 
-Stormforge 2.3.0 bundles EMI 1.1.24 with TMRV 0.9.2, whose newer JEI API can cause `AbstractMethodError` in the crafting-table recipe view. The original full-pack release does not include the separate compatibility add-on.
+Legacy `mcl1_…` joining and **Share with Tailcat** hosting keep their existing behavior and six original native binaries. Those binaries cover macOS, Linux, and Windows on amd64 and arm64, but they do **not** provide modern-invitation support outside Apple silicon. This release deliberately rejects modern invitations on other platforms. Do not infer platform support from the legacy binaries.
 
-[Download the recipe compatibility add-on](https://github.com/divyamk/stormforge-tailcat/releases/tag/recipe-compat-0.1.0) and install it into your existing instance, then restart. [Give these instructions to your bot](FIX_JEI_WITH_GPT.md). Recipe interaction still needs to be checked in-game after installation; see the release notes for validation limits.
+## Validation
 
-## Let GPT set it up
+- Java 17 Forge build and 10 Java tests passed.
+- Go helper regression tests passed, including private-input validation and a 4 MiB bidirectional-copy/half-close fixture.
+- An isolated client-only relay control delivered the login-shaped 726,597-byte server burst, another 1.5 MiB to the client, and 1 MiB back plus acknowledgement, with the fixture server unchanged.
+- The released JAR completed a real authenticated button join into a live world on Apple silicon.
+- Other operating systems/architectures have not received a live modern-helper test. This release does not ship or enable them.
 
-Copy the prompt in [SETUP_WITH_GPT.md](SETUP_WITH_GPT.md) into your friend's GPT/Codex. A chat with no computer access can guide them, but cannot operate Modrinth for them.
-
-## Validation and limits
-
-- Forge build and all eight unit tests pass.
-- The six original native helpers match their bundled checksums.
-- The macOS ARM helper passed an invalid-invitation check and a host/join data-forwarding test (on retry).
-- v0.1.1 launched in the host's Stormforge instance through the title and world-creation screens. It fixes v0.1.0's missing `pack.mcmeta`, which triggered Forge's loading-warning screen and Crash Assistant.
-- Actual multiplayer gameplay between two separate computers has not yet been tested. Windows, Intel macOS, and Linux helpers are included but were not executed in this session.
+The server must independently match the pack's required mod channels. The successful server also included MezzConfig 0.6.3 and Pretty Rain 1.1.3. This client update contains neither server configuration nor server-only patches.
 
 ## Source and build
 
-The original Fabric source remains in `mod/`; the Forge 1.20.1 port is in `forge/` and reuses the original native assets. With JDK 17:
+The original Fabric source is in `mod/`. The Forge port is in `forge/`. The modern SDK helper source and pinned dependencies are in `forge/psk-join/`; its checked binary and checksum are in `forge/src/main/resources/assets/mclink/psk-native/`.
+
+The shipped helper was built with Go 1.27.4, `CGO_ENABLED=0`, `GOOS=darwin`, `GOARCH=arm64`, `-trimpath`, `-tags=ts_omit_ssh`. To rebuild it from `forge/psk-join/`:
+
+```sh
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath -tags=ts_omit_ssh -o ../src/main/resources/assets/mclink/psk-native/darwin-arm64/mclink-psk-join .
+go test ./...
+```
+
+If rebuilding the helper, update its SHA-256 in the adjacent `checksums.json`. Then, using JDK 17:
 
 ```sh
 cd forge
-./gradlew build
+./gradlew test build
 ```
 
-The reobfuscated release JAR is produced in `forge/build/libs/`. Release artifacts have SHA-256 hashes in `SHA256SUMS`.
+The reobfuscated JAR is in `forge/build/libs/`. Rebuilding can change ZIP timestamps and the JAR checksum; use the published asset checksum when installing the verified release.
 
-## Attribution
+## Earlier pack and recipe add-on
 
-[Stormforge: Never Ending Rain](https://modrinth.com/modpack/stormforge) is the upstream pack, pinned to [2.3.0](https://modrinth.com/modpack/stormforge/version/k5ownM36), listed under MIT on Modrinth. Its constituent mods retain their own licenses and are downloaded from their original URLs by Modrinth. Upstream metadata and download hash are recorded in `pack/upstream.json`.
+The [original importable pack](https://github.com/divyamk/stormforge-tailcat/releases/tag/stormforge-2.3.0-tailcat-0.1.1) bundles Tailcat 0.1.1; it does not contain this modern-server fix. Existing profiles should receive the single-JAR update above.
 
-Tailcat for Minecraft and the original native helpers are from Tailscale's BSD-3-Clause project; see [LICENSE](LICENSE) and [original README](README-UPSTREAM.md). This fork is not endorsed by Tailscale or the Stormforge authors.
+The separate [recipe compatibility add-on](https://github.com/divyamk/stormforge-tailcat/releases/tag/recipe-compat-0.1.0) and [its guide](FIX_JEI_WITH_GPT.md) address the EMI/TMRV crafting-table rendering issue. They are separate from this transport update.
 
-To rebuild the importable pack after building the Forge JAR:
+## Attribution and license
 
-```sh
-python3 scripts/package-stormforge.py forge/build/libs/tailcat-for-minecraft-0.1.1-forge-1.20.1.jar Stormforge-Tailcat-2.3.0-0.1.1.mrpack
-```
+This is a fork of [Tailcat for Minecraft](https://github.com/tailscale/tailcat-for-minecraft), not an official Stormforge source repository. It is not endorsed by Tailscale or the pack authors. Tailcat is a prototype, not an officially supported Tailscale product.
 
-The packager verifies the upstream SHA-512 before preserving its contents and adding Tailcat. ZIP timestamps can change the archive checksum between builds; `SHA256SUMS` describes the uploaded release assets.
+Tailcat for Minecraft and its original native helpers are BSD-3-Clause; see [LICENSE](LICENSE) and [original README](README-UPSTREAM.md). The modern helper uses the official [Tailcat SDK](https://github.com/tailscale/tailcat). Dependency notices accompany the release in `THIRD_PARTY_LICENSES.txt`; retain them when redistributing its binaries.
+
+[Stormforge](https://modrinth.com/modpack/stormforge) is a separate modpack. Its constituent mods retain their own licenses; this release distributes only the Tailcat client update.

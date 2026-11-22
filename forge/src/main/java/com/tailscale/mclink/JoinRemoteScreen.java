@@ -21,8 +21,8 @@ public final class JoinRemoteScreen extends Screen {
         invite = new EditBox(font, width / 2 - 150, height / 2 - 22, 300, 20,
                 Component.translatable("mclink.invite"));
         invite.setMaxLength(8192);
-        invite.setHint(Component.translatable("mclink.invite_hint"));
-        invite.setResponder(value -> connect.active = value.trim().startsWith("mcl1_"));
+        invite.setHint(Component.literal("Paste a Tailcat invitation or address"));
+        invite.setResponder(value -> connect.active = JoinInput.accepts(value));
         addRenderableWidget(invite);
         connect = addRenderableWidget(Button.builder(Component.translatable("mclink.connect"), b -> begin())
                 .bounds(width / 2 - 102, height / 2 + 12, 100, 20).build());
