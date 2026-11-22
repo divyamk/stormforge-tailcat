@@ -47,12 +47,16 @@ public final class ScreenState implements AutoCloseable {
     }
 
     public synchronized CompletableFuture<Void> join(Minecraft minecraft, Screen parent, String invitation) {
+        return join(minecraft, parent, invitation, JoinMode.defaultMode());
+    }
+
+    public synchronized CompletableFuture<Void> join(Minecraft minecraft, Screen parent, String invitation, JoinMode mode) {
         stop();
         try {
             String value = invitation.trim();
             Session started;
             if (JoinInput.isPskAddress(value)) {
-                HelperProcess process = HelperProcess.startPskJoin(value, this::onEvent);
+                HelperProcess process = HelperProcess.startPskJoin(value, mode, this::onEvent);
                 started = new Session(SessionMode.JOIN, process, null, false);
                 session = started;
             } else if (JoinInput.accepts(value)) {

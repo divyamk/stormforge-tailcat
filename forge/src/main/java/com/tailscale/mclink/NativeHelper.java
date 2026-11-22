@@ -52,6 +52,18 @@ public final class NativeHelper {
                 relative, sums, name);
     }
 
+    public static Path extractAutomaticJoin() throws IOException {
+        Platform platform = Platform.current();
+        if (!"darwin-arm64".equals(platform.resourceDirectory())) {
+            throw new IOException("Automatic mode supports only Apple silicon Macs");
+        }
+        String name = "mclink-psk-join-automatic";
+        String relative = platform.resourceDirectory() + "/" + name;
+        String base = "/assets/mclink/automatic-native/";
+        return extractPackaged(platform, "0.1.5-forge-1.20.1-automatic-mss1000", base + relative,
+                relative, readChecksums(base + "checksums.json"), name);
+    }
+
     private static Path extractPackaged(Platform platform, String version, String resource,
                                         String relative, JsonObject sums, String executableName) throws IOException {
         if (!sums.has(relative) || !sums.get(relative).isJsonPrimitive()) throw new IOException("Missing checksum for " + relative);

@@ -1,0 +1,55 @@
+--- a/pkg/tcpip/adapters/gonet/gonet.go
++++ b/pkg/tcpip/adapters/gonet/gonet.go
+@@ -512,6 +512,12 @@
+ 		return nil, errors.New(err.String())
+ 	}
+ 
++	// Scoped Minecraft hook: default no-op; only virtual TCP25565.
++	if err := minecraftPreConnectMSS(ep, remoteAddr); err != nil {
++		ep.Close()
++		return nil, errors.New("Minecraft MSS option rejected")
++	}
++
+ 	// Create wait queue entry that notifies a channel.
+ 	//
+ 	// We do this unconditionally as Connect will always return an error.
+--- a/pkg/tcpip/adapters/gonet/minecraft_mss.go
++++ b/pkg/tcpip/adapters/gonet/minecraft_mss.go
+@@ -0,0 +1,27 @@
++//go:build tailcat_minecraft_mss
++
++package gonet
++
++import (
++	"gvisor.dev/gvisor/pkg/tcpip"
++	"sync/atomic"
++)
++
++var minecraftMSS atomic.Uint32
++
++// ConfigureMinecraftMSS accepts only disabled0 or Minecraft1000.
++// Called once before any dial; changes no host settings.
++func ConfigureMinecraftMSS(n int) bool {
++	if n != 0 && n != 1000 {
++		return false
++	}
++	minecraftMSS.Store(uint32(n))
++	return true
++}
++func minecraftPreConnectMSS(ep tcpip.Endpoint, remote tcpip.FullAddress) tcpip.Error {
++	n := minecraftMSS.Load()
++	if n == 0 || remote.Port != 25565 {
++		return nil
++	}
++	return ep.SetSockOptInt(tcpip.MaxSegOption, int(n))
++}
+--- a/pkg/tcpip/adapters/gonet/minecraft_mss_disabled.go
++++ b/pkg/tcpip/adapters/gonet/minecraft_mss_disabled.go
+@@ -0,0 +1,7 @@
++//go:build !tailcat_minecraft_mss
++
++package gonet
++
++import "gvisor.dev/gvisor/pkg/tcpip"
++
++func minecraftPreConnectMSS(tcpip.Endpoint, tcpip.FullAddress) tcpip.Error { return nil }

@@ -50,15 +50,18 @@ public final class HelperProcess implements AutoCloseable {
     }
 
     public static HelperProcess startPskJoin(String address, Consumer<HelperEvent> events) throws IOException {
+        return startPskJoin(address, JoinMode.defaultMode(), events);
+    }
+
+    public static HelperProcess startPskJoin(String address, JoinMode mode, Consumer<HelperEvent> events) throws IOException {
         if (!JoinInput.isPskAddress(address)) {
             throw new IOException("Invalid Tailcat address");
         }
-        Path executable = NativeHelper.extractPskJoin();
-        // Keep the modern client on its invitation's encrypted DERP path. The
-        // direct UDP path stalls under a Forge login burst on this platform.
-        // Scope the workaround to this child; legacy join and hosting are unchanged.
-        ProcessBuilder builder = new ProcessBuilder(executable.toString());
-        builder.environment().put("TS_DEBUG_ALWAYS_USE_DERP", "true");
+        Path executable = mode == JoinMode.AUTOMATIC ? NativeHelper.extractAutomaticJoin() : NativeHelper.extractPskJoin();
+        // Scope the explicit per-attempt mode to this modern child process.
+        // Automatic leaves the SDK's direct discovery and relay fallback intact.
+        ProcessBuilder builder = new ProcessBuilder(mode.modernCommand(executable.toString()));
+        mode.configure(builder);
         HelperProcess helper = new HelperProcess(builder.start(), events);
         try {
             // The invitation is a credential. Keep it off the command line and do not log it.

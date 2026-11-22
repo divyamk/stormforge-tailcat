@@ -1,6 +1,6 @@
 THIRD-PARTY REDISTRIBUTION NOTICES
 
-This file accompanies the unchanged legacy helpers and the modern helper in Tailcat Forge 0.1.3. Module paths and versions are from their Go build information.
+This file accompanies the unchanged legacy/Relay helpers and the separate Automatic helper in Tailcat Forge 0.1.5. The Automatic helper uses the same pinned SDK dependency versions, with a narrowly scoped gVisor pre-connect Minecraft MSS modification; its patch is supplied with source. Module paths and versions are from their Go build information.
 
 
 === Tailcat for Minecraft / Forge port ===

@@ -1,70 +1,41 @@
 # Stormforge: Never Ending Rain + Tailcat
 
-Unofficial Tailcat Forge client for **Stormforge 2.3.0** ([pack version k5ownM36](https://modrinth.com/modpack/stormforge/version/k5ownM36)), Minecraft **1.20.1**, Forge **47.4.10**, and **arm64 Java 17**.
+Unofficial Forge client for **Stormforge 2.3.0** (Modrinth version **k5ownM36**), Minecraft **1.20.1**, Forge **47.4.10**.
 
-## Current update: Tailcat 0.1.3
+## Current update: Tailcat 0.1.5
 
-**Modern Tailcat v0.7.0 invitations: Apple silicon Macs, macOS 13 or newer only.** Use an arm64 Java 17 runtime. This is the exact client JAR verified to authenticate and enter a live server through **Multiplayer → Connect with Tailcat**.
+**Apple silicon Macs, macOS 13+, arm64 Java 17 only for modern invitations.**
 
-[Download release 0.1.3](https://github.com/divyamk/stormforge-tailcat/releases/tag/tailcat-forge-0.1.3) · [Give the update instructions to your bot](UPDATE_WITH_GPT.md)
+[Download 0.1.5](https://github.com/divyamk/stormforge-tailcat/releases/tag/tailcat-forge-0.1.5) · [Update prompt for your bot](UPDATE_WITH_GPT.md) · [Release notes](RELEASE_NOTES.md)
 
-File: `tailcat-for-minecraft-0.1.3-forge-1.20.1.jar`
+File: `tailcat-for-minecraft-0.1.5-forge-1.20.1.jar`
 
-SHA-256:
+SHA-256: `15b8ede488c45f82889a735a6cea4a0c29b996ed9a7e8c5bb2e243b4d2e3750f`
 
-```text
-3e037a498b8966b9c7e29978fa251784c0a8069d1ba66518f2f62b61cde16efd
-```
+Quit Minecraft, verify it has exited, and back up your current Tailcat JAR outside mods. Verify this download's checksum and replace only Tailcat, keeping exactly one enabled Tailcat JAR. Preserve all other mods, saves and settings.
 
-1. Confirm the existing profile is Stormforge 2.3.0, Minecraft 1.20.1, Forge 47.4.10, running arm64 Java 17 on macOS 13+.
-2. Quit Minecraft yourself and wait for its process to exit. Back up the existing Tailcat JAR outside the profile's `mods` folder.
-3. Download the JAR from the release, verify its SHA-256, and replace only the existing Tailcat JAR. Keep exactly one enabled Tailcat JAR. Preserve all other mods, settings, and worlds.
-4. Launch that same profile, sign in with your own Minecraft account, and use **Multiplayer → Connect with Tailcat**. Paste the server invitation privately into the game. Never put it in chat, source control, shell arguments, screenshots, or logs.
-5. Success means reaching the authenticated server world. If Forge reports incompatible or missing channels, report the exact mod/channel names to the server owner; do not remove mods or disable authentication to work around it.
-
-Rollback: quit Minecraft, remove this JAR, and restore the verified previous Tailcat JAR from the backup.
-
-## Remaining limitation
-
-This release fixes the initial authenticated button join. Snapback and disconnections have still been observed during heavier chunk/world traffic. It is not a guarantee of sustained traffic stability; server-side investigation is separate. If this happens, report the non-sensitive symptom to the server owner rather than repeatedly reinstalling or changing security/network settings.
+Launch the same profile and open **Multiplayer → Connect with Tailcat**. Paste the invitation privately in-game, then select **Mode: Automatic (try direct)** and connect. **Relay remains the default and original fallback.** Never put invitations or login tokens in commands, logs, screenshots or source control. Rollback: with Minecraft closed, restore the verified previous JAR.
 
 ## What changed
 
-Modern raw `tc…` invitations use a separate helper built from the official Tailcat v0.7.0 Go SDK. The invitation reaches the helper over stdin. SDK logging is suppressed to keep credentials private. The helper binds only loopback and connects to virtual Minecraft port 25565.
+Automatic uses a separate Mac helper that advertises TCP MSS 1000 before connecting to virtual Minecraft port 25565. This keeps its Minecraft TCP segments smaller. Normal Tailcat discovery and encrypted relay fallback remain available. It does not force a physical route or change the host MTU, VPN, public ports, server settings or authentication.
 
-Only the modern helper subprocess sets `TS_DEBUG_ALWAYS_USE_DERP=true`. This keeps it on the invitation's existing encrypted DERP relay and avoids the burst-delivery stall reproduced with automatic path selection. No system networking, server setting, account authentication, or security control is changed. Relay use can have higher latency than a working direct path.
+The Relay helper and all six original legacy native binaries remain byte-for-byte unchanged. Legacy joining and hosting are unchanged. Legacy binaries for other platforms do not imply modern-invitation support on those platforms.
 
-Legacy `mcl1_…` joining and **Share with Tailcat** hosting keep their existing behavior and six original native binaries. Those binaries cover macOS, Linux, and Windows on amd64 and arm64, but they do **not** provide modern-invitation support outside Apple silicon. This release deliberately rejects modern invitations on other platforms. Do not infer platform support from the legacy binaries.
+Invitations reach helpers through stdin; SDK logging is suppressed. Helpers listen only on local loopback and connect to the existing authorized virtual Minecraft port. No diagnostic telemetry is shipped.
 
-## Validation
+## Validation and limits
 
-- Java 17 Forge build and 10 Java tests passed.
-- Go helper regression tests passed, including private-input validation and a 4 MiB bidirectional-copy/half-close fixture.
-- An isolated client-only relay control delivered the login-shaped 726,597-byte server burst, another 1.5 MiB to the client, and 1 MiB back plus acknowledgement, with the fixture server unchanged.
-- The released JAR completed a real authenticated button join into a live world on Apple silicon.
-- Other operating systems/architectures have not received a live modern-helper test. This release does not ship or enable them.
-
-The server must independently match the pack's required mod channels. The successful server also included MezzConfig 0.6.3 and Pretty Rain 1.1.3. This client update contains neither server configuration nor server-only patches.
+- 14 Forge Java tests and six Automatic-helper Go tests passed.
+- Local SYN checks verified MSS 1000 on virtual port 25565 and unchanged behavior on an unrelated port.
+- The exact released JAR completed authenticated in-game joining and more than two minutes of continuous gameplay on one Apple silicon Mac/network path; the player reported improved gameplay.
+- This is not a guarantee for other networks, nor a claim that a particular upstream component caused the earlier failures. Server-side mod compatibility remains the server owner's responsibility.
 
 ## Source and build
 
-The original Fabric source is in `mod/`. The Forge port is in `forge/`. The modern SDK helper source and pinned dependencies are in `forge/psk-join/`; its checked binary and checksum are in `forge/src/main/resources/assets/mclink/psk-native/`.
+The original Fabric source is in `mod/`; the Forge client is in `forge/`. The unchanged Relay helper is in `forge/psk-join/`. Automatic source, the precise pinned gVisor patch and reconstruction instructions are in [forge/psk-join-automatic/BUILD_AUTOMATIC.md](forge/psk-join-automatic/BUILD_AUTOMATIC.md). Its checked binary and checksum are in `forge/src/main/resources/assets/mclink/automatic-native/`.
 
-The shipped helper was built with Go 1.27.4, `CGO_ENABLED=0`, `GOOS=darwin`, `GOARCH=arm64`, `-trimpath`, `-tags=ts_omit_ssh`. To rebuild it from `forge/psk-join/`:
-
-```sh
-CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath -tags=ts_omit_ssh -o ../src/main/resources/assets/mclink/psk-native/darwin-arm64/mclink-psk-join .
-go test ./...
-```
-
-If rebuilding the helper, update its SHA-256 in the adjacent `checksums.json`. Then, using JDK 17:
-
-```sh
-cd forge
-./gradlew test build
-```
-
-The reobfuscated JAR is in `forge/build/libs/`. Rebuilding can change ZIP timestamps and the JAR checksum; use the published asset checksum when installing the verified release.
+The shipped Automatic helper was built with Go 1.27.4, `CGO_ENABLED=0`, Darwin arm64, `-trimpath` and `-tags=tailcat_minecraft_mss`. The Forge JAR was built with Java 17. Rebuilding the JAR can change ZIP metadata/checksums; install the verified release asset rather than assuming rebuilt bytes match it.
 
 ## Earlier pack and recipe add-on
 
