@@ -49,7 +49,17 @@ public final class ScreenState implements AutoCloseable {
     public synchronized CompletableFuture<Void> join(Minecraft minecraft, Screen parent, String invitation) {
         stop();
         try {
-            Session started = start(SessionMode.JOIN, List.of("join", "--invite", invitation.trim()), null, false);
+            String value = invitation.trim();
+            Session started;
+            if (JoinInput.isPskAddress(value)) {
+                HelperProcess process = HelperProcess.startPskJoin(value, this::onEvent);
+                started = new Session(SessionMode.JOIN, process, null, false);
+                session = started;
+            } else if (JoinInput.accepts(value)) {
+                started = start(SessionMode.JOIN, List.of("join", "--invite", value), null, false);
+            } else {
+                return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid Tailcat invitation or address"));
+            }
             return awaitReady(started).thenAccept(event -> minecraft.execute(() -> {
                 ServerData info = new ServerData("Tailcat World", event.address(), false);
                 ConnectScreen.startConnecting(parent, minecraft, ServerAddress.parseString(event.address()), info, false);

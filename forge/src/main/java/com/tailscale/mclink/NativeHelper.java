@@ -36,12 +36,30 @@ public final class NativeHelper {
         String relative = platform.resourceDirectory() + "/" + platform.executableName();
         String resource = "/assets/mclink/native/" + relative;
         JsonObject sums = checksums();
+        return extractPackaged(platform, "0.1.1-forge-1.20.1", resource, relative, sums, platform.executableName());
+    }
+
+    public static Path extractPskJoin() throws IOException {
+        Platform platform = Platform.current();
+        if (!"darwin-arm64".equals(platform.resourceDirectory())) {
+            throw new IOException("This local Tailcat patch supports only Apple silicon Macs");
+        }
+        String name = "mclink-psk-join";
+        String relative = platform.resourceDirectory() + "/" + name;
+        String base = "/assets/mclink/psk-native/";
+        JsonObject sums = readChecksums(base + "checksums.json");
+        return extractPackaged(platform, "0.1.1-forge-1.20.1-psk-v0.7.0", base + relative,
+                relative, sums, name);
+    }
+
+    private static Path extractPackaged(Platform platform, String version, String resource,
+                                        String relative, JsonObject sums, String executableName) throws IOException {
         if (!sums.has(relative) || !sums.get(relative).isJsonPrimitive()) throw new IOException("Missing checksum for " + relative);
         String expected = sums.get(relative).getAsString();
-        Path dir = FMLPaths.GAMEDIR.get().resolve("tailcat-for-minecraft").resolve("0.1.1-forge-1.20.1")
+        Path dir = FMLPaths.GAMEDIR.get().resolve("tailcat-for-minecraft").resolve(version)
                 .resolve(platform.resourceDirectory());
         Files.createDirectories(dir);
-        Path destination = dir.resolve(platform.executableName());
+        Path destination = dir.resolve(executableName);
         Path lockPath = dir.resolve("extract.lock");
         try (FileChannel channel = FileChannel.open(lockPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
              FileLock ignored = channel.lock()) {
@@ -73,7 +91,11 @@ public final class NativeHelper {
     }
 
     static JsonObject checksums() throws IOException {
-        try (InputStream in = NativeHelper.class.getResourceAsStream("/assets/mclink/native/checksums.json")) {
+        return readChecksums("/assets/mclink/native/checksums.json");
+    }
+
+    private static JsonObject readChecksums(String resource) throws IOException {
+        try (InputStream in = NativeHelper.class.getResourceAsStream(resource)) {
             if (in == null) throw new IOException("Missing native checksums");
             return JsonParser.parseString(new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
         }
