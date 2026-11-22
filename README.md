@@ -24,6 +24,10 @@ SHA-256:
 
 Rollback: quit Minecraft, remove this JAR, and restore the verified previous Tailcat JAR from the backup.
 
+## Remaining limitation
+
+This release fixes the initial authenticated button join. Snapback and disconnections have still been observed during heavier chunk/world traffic. It is not a guarantee of sustained traffic stability; server-side investigation is separate. If this happens, report the non-sensitive symptom to the server owner rather than repeatedly reinstalling or changing security/network settings.
+
 ## What changed
 
 Modern raw `tc…` invitations use a separate helper built from the official Tailcat v0.7.0 Go SDK. The invitation reaches the helper over stdin. SDK logging is suppressed to keep credentials private. The helper binds only loopback and connects to virtual Minecraft port 25565.

@@ -23,6 +23,6 @@ This is the verified Forge 0.1.3 build for modern Tailcat invitations on Apple s
 
 When ready, have me launch the same profile and use **Multiplayer → Connect with Tailcat** once. I will obtain the invitation privately from my friend and paste it directly into the game. Do not request, read, echo, log, commit, or send the invitation or any login token. Do not join by terminal instead of the in-game button.
 
-Verify success by actual authenticated entry into the server world. If there is an error, capture only its non-sensitive reason and mod/channel names. Do not repeatedly retry, remove mods, update the whole pack, or weaken security. Report the blocker and next narrow action. The server owner is responsible for server-side compatibility.
+This build fixes initial joining, but snapback and disconnections can still occur during heavier chunk/world traffic; server-side investigation is separate. Do not promise it fixes all connection instability. Verify initial-join success by actual authenticated entry into the server world, and report sustained-gameplay problems separately. If there is an error, capture only its non-sensitive reason and mod/channel names. Do not repeatedly retry, remove mods, update the whole pack, or weaken security. Report the blocker and next narrow action. The server owner is responsible for server-side compatibility.
 
 ---
